@@ -29,9 +29,6 @@ An active Azure subscription. If you don't yet have an account, you can create o
 To deploy infrastucture to your azure subscription, provide a unique value to suffix and select location from the list.
 <img width="572" alt="image" src="https://github.com/grnisha/signalr-eventing-demo/assets/11030157/ad5af185-efad-42dc-88e1-b9f29cb7eb0e">
 
-This will deploy the following services to azure.
-<img width="874" alt="image" src="https://github.com/grnisha/signalr-eventing-demo/assets/11030157/7cff9680-d36d-4710-992d-bdbd5dcb7da6">
-
 Alternatively, you can deploy the infrastructure using github action workflow [deploy-main-infra.yml](https://raw.githubusercontent.com/grnisha/signalr-eventing-demo/main/.github/workflows/deploy-main-infra.yml) and the applications using [deploy-apps.yml](https://raw.githubusercontent.com/grnisha/signalr-eventing-demo/main/.github/workflows/deploy-apps.yml)
 
 Please configure the following secrets to use github actions.
