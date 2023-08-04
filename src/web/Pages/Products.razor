@@ -1,0 +1,116 @@
+﻿@page "/products"
+@using Azure.Messaging.WebPubSub.Clients;
+@inject HttpClient _httpClient;
+@inject IProductService _productService;
+@inject NavigationManager _navigationManager;
+
+<h1>Products</h1>
+
+<h2>Polling</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prd in products)
+
+        {
+            <tr>
+                <td>@prd.Name</td>
+                <td>@prd.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>WebPubSub</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prd in productsFastLoad)
+
+        {
+            <tr>
+                <td>@prd.Name</td>
+                <td>@prd.Price</td>
+                <td><button class="btn btn-primary" @onclick="(() => ShowProduct(prd.Id))"><i class="oi oi-pencil"></i></button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+
+<button class="btn btn-primary" @onclick="CreateProduct">Add Product</button>
+
+
+@code {
+
+    private List<Demo.WebPubSub.Web.Models.Product> products = new List<Demo.WebPubSub.Web.Models.Product>();
+    private List<Demo.WebPubSub.Web.Models.Product> productsFastLoad = new List<Demo.WebPubSub.Web.Models.Product>();
+    private WebPubSubClient client;
+   
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            //Get Products using http client
+            await _productService.GetProductsAsync();
+            products = _productService.Products;
+            //Initial load before changes
+            productsFastLoad = products;
+            
+            //Get the client access uri
+            var con =  await _httpClient.GetFromJsonAsync<Negotiate>("/api/GetWebPubSubConnection?userid=democlient1");
+            client = new WebPubSubClient(new Uri(con.Url));
+            await client.StartAsync();
+            client.ServerMessageReceived += HandleServerMessageReceived;  
+      
+            //Set timer for non-websocket (http client prodcut polling)
+            System.Timers.Timer t = new System.Timers.Timer();
+            t.Interval = 10000;
+            t.Elapsed += async (s, e) =>
+            {
+                products = await _httpClient.GetFromJsonAsync<List<Demo.WebPubSub.Web.Models.Product>>("/api/products") ?? new List<Demo.WebPubSub.Web.Models.Product>();
+                await InvokeAsync(StateHasChanged);
+            };
+            t.Start();
+
+                        
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+    private Task HandleServerMessageReceived(WebPubSubServerMessageEventArgs eventArgs)
+    {
+        var jsonMessage = System.Text.Encoding.UTF8.GetString(eventArgs.Message.Data);
+        productsFastLoad = System.Text.Json.JsonSerializer.Deserialize<List<Demo.WebPubSub.Web.Models.Product>>(jsonMessage) ?? new List<Demo.WebPubSub.Web.Models.Product>();
+    
+        // Since we are updating the UI, we need to trigger a state change.
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    } 
+
+    private void ShowProduct(Guid id)
+    {
+        _navigationManager.NavigateTo($"/product/{id}");
+    }
+
+    private void CreateProduct()
+    {
+        _navigationManager.NavigateTo($"/product");
+    }
+}
