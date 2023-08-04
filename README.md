@@ -24,12 +24,7 @@ An active Azure subscription. If you don't yet have an account, you can create o
 
 ## Deploy to Azure
 
-[![Deploy Infra to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fgrnisha%2Fsignalr-eventing-demo%2Fmain%2Fdeploy.json)
-
-To deploy infrastucture to your azure subscription, provide a unique value to suffix and select location from the list.
-<img width="572" alt="image" src="https://github.com/grnisha/signalr-eventing-demo/assets/11030157/ad5af185-efad-42dc-88e1-b9f29cb7eb0e">
-
-Alternatively, you can deploy the infrastructure using github action workflow [deploy-main-infra.yml](https://raw.githubusercontent.com/grnisha/signalr-eventing-demo/main/.github/workflows/deploy-main-infra.yml) and the applications using [deploy-apps.yml](https://raw.githubusercontent.com/grnisha/signalr-eventing-demo/main/.github/workflows/deploy-apps.yml)
+Deploy the infrastructure using github action workflow [deploy-main-infra.yml](https://raw.githubusercontent.com/grnisha/signalr-eventing-demo/main/.github/workflows/deploy-main-infra.yml) and the applications using [deploy-apps.yml](https://raw.githubusercontent.com/grnisha/signalr-eventing-demo/main/.github/workflows/deploy-apps.yml)
 
 Please configure the following secrets to use github actions.
   - AZURE_CREDENTIALS - Service principle used to authenticate to Azure. Please check [documentation](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Cwindows#create-a-service-principal).
